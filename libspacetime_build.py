@@ -27,6 +27,8 @@ ffibuilder.cdef(r"""
 
     mars_time_t mars_time(mars_time_t*);
     time_t mars_time_to_earth_time(mars_time_t);
+
+    double earth_time_to_msd(time_t);
     mars_time_t earth_time_to_mars_time(time_t);
 
     double diffmarstime(mars_time_t, mars_time_t);
