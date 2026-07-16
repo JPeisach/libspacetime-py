@@ -49,6 +49,15 @@ class struct_marstime(_MarsTimeTuple):
 def mars_time() -> float:
     return lib.earth_time_to_msd(int(time())) * 86400.0
 
+def strfmarstime(format: str, time_tuple: _MarsTimeTuple | struct_marstime, /) -> str:
+    _format = ffi.new("char[]", format.encode("utf-8"))
+    tm = ffi.new("struct mars_tm*", time_tuple)
+    _buf = ffi.new("char[]", 256)
+
+    # 256 is arbitrary
+    lib.strfmarstime(_buf, 256, _format, tm)
+    return ffi.string(_buf).decode()
+
 def strpmarstime(data_string: str, format: str = "%a %b %d %H:%M:%S %Y", /) -> struct_marstime:
     # There may be a better way to do this..
     _data_string = ffi.new("char[]", data_string.encode("utf-8"))
