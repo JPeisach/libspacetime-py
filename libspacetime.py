@@ -30,6 +30,10 @@ class struct_marstime(_MarsTimeTuple):
 def mars_time() -> float:
     return lib.earth_time_to_msd(int(time())) * 86400.0
 
+def ammarstime(seconds: float | int | None = None, /) -> struct_marstime:
+    _out = lib.ammarstime(ffi.new("long*", seconds))
+    return struct_marstime(mars_tm_year=_out.mars_tm_year, mars_tm_mon=_out.mars_tm_mon, mars_tm_msol=_out.mars_tm_msol, mars_tm_hour=_out.mars_tm_hour, mars_tm_min=_out.mars_tm_min, mars_tm_sec=_out.mars_tm_sec, mars_tm_wsol=_out.mars_tm_wsol, mars_tm_ysol=_out.mars_tm_ysol)
+
 # TODO: I don't get the rationale for how a float could be returned for this.
 def mkmarstime(time_tuple: _MarsTimeTuple | struct_marstime, /) -> float:
     # As far as I know.. the best way to do this
