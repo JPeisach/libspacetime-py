@@ -16,38 +16,33 @@ class struct_marstime(_MarsTimeTuple):
     # no isdst var
     __match_args__: Final = ("mars_tm_year", "mars_tm_mon", "mars_tm_msol", "mars_tm_hour", "mars_tm_min", "mars_tm_sec", "mars_tm_wsol", "mars_tm_ysol")
 
-    @property
-    def mars_tm_year(self) -> int:
-        ...
-
-    @property
-    def mars_tm_mon(self) -> int:
-        ...
-
-    @property
-    def mars_tm_msol(self) -> int:
-        ...
-
-    @property
-    def mars_tm_hour(self) -> int:
-        ...
-
-    @property
-    def mars_tm_min(self) -> int:
-        ...
-
-    @property
-    def mars_tm_sec(self) -> int:
-        ...
-
-    @property
-    def mars_tm_wsol(self) -> int:
-        ...
-
+    def __init__(self, mars_tm_year, mars_tm_mon, mars_tm_msol, mars_tm_hour, mars_tm_min, mars_tm_sec, mars_tm_wsol, mars_tm_ysol):
+        self.mars_tm_year = mars_tm_year
+        self.mars_tm_mon = mars_tm_mon
+        self.mars_tm_msol = mars_tm_msol
+        self.mars_tm_hour = mars_tm_hour
+        self.mars_tm_min = mars_tm_min
+        self.mars_tm_sec = mars_tm_sec
+        self.mars_tm_wsol = mars_tm_wsol
+        self.mars_tm_ysol = mars_tm_ysol
 
 
 def mars_time() -> float:
     return lib.earth_time_to_msd(int(time())) * 86400.0
+
+# TODO: I don't get the rationale for how a float could be returned for this.
+def mkmarstime(time_tuple: _MarsTimeTuple | struct_marstime, /) -> float:
+    # As far as I know.. the best way to do this
+    tm = ffi.new("struct mars_tm*")
+    tm.mars_tm_year = time_tuple.mars_tm_year
+    tm.mars_tm_mon = time_tuple.mars_tm_mon
+    tm.mars_tm_msol = time_tuple.mars_tm_msol
+    tm.mars_tm_hour = time_tuple.mars_tm_hour
+    tm.mars_tm_min = time_tuple.mars_tm_min
+    tm.mars_tm_sec = time_tuple.mars_tm_sec
+    tm.mars_tm_wsol = time_tuple.mars_tm_wsol
+    tm.mars_tm_ysol = time_tuple.mars_tm_ysol
+    return lib.mkmarstime(tm)
 
 def strfmarstime(format: str, time_tuple: _MarsTimeTuple | struct_marstime = ..., /) -> str:
     _format = ffi.new("char[]", format.encode("utf-8"))
@@ -64,4 +59,5 @@ def strpmarstime(data_string: str, format: str = "%a %b %d %H:%M:%S %Y", /) -> s
     _format = ffi.new("char[]", format.encode("utf-8"))
     _out = ffi.new("struct mars_tm*")
     lib.strpmarstime(_data_string, _format, _out)
-    return struct_marstime((_out.mars_tm_year, _out.mars_tm_mon, _out.mars_tm_msol, _out.mars_tm_hour, _out.mars_tm_min, _out.mars_tm_sec, _out.mars_tm_wsol, _out.mars_tm_ysol))
+
+    return struct_marstime(mars_tm_year=_out.mars_tm_year, mars_tm_mon=_out.mars_tm_mon, mars_tm_msol=_out.mars_tm_msol, mars_tm_hour=_out.mars_tm_hour, mars_tm_min=_out.mars_tm_min, mars_tm_sec=_out.mars_tm_sec, mars_tm_wsol=_out.mars_tm_wsol, mars_tm_ysol=_out.mars_tm_ysol)
