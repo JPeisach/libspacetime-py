@@ -7,9 +7,6 @@ _MarsTimeTuple: TypeAlias = tuple[int, int, int, int, int, int, int, int]
 
 # TODO: Match constructor of struct_time
 # TODO: How to make it match from when we get the ctype?
-# TODO: Make it print like this:
-# Mars time called from FFI: (191, 1, 4, 0, 0, 0, 0, 0)
-# strptime called from python: time.struct_time(tm_year=2000, tm_mon=10, tm_mday=10, tm_hour=0, tm_min=0, tm_sec=0, tm_wday=1, tm_yday=284, tm_isdst=-1)
 @final
 class struct_marstime(_MarsTimeTuple):
     # this is cool
@@ -26,6 +23,16 @@ class struct_marstime(_MarsTimeTuple):
         self.mars_tm_wsol = mars_tm_wsol
         self.mars_tm_ysol = mars_tm_ysol
 
+    # Python actually has a module (written in C), so that is why it prints out
+    # like "time.struct_time(tm_year=foo, tm_mon=bar, ...)"
+    # So we need to do this ourselves unless we use a module.
+    # Month starts at 0, instead of 1, so add 1
+    def __str__(self) -> str:
+        return f"libspacetime.struct_marstime(tm_year={self.mars_tm_year}, tm_mon={self.mars_tm_mon + 1}, tm_msol={self.mars_tm_msol}, tm_hour={self.mars_tm_hour}, tm_min={self.mars_tm_min}, tm_sec={self.mars_tm_sec}, tm_wsol={self.mars_tm_wsol}, tm_ysol={self.mars_tm_ysol}"
+
+    def __repr__(self) -> str:
+        # see above
+        return self.__str__()
 
 def mars_time() -> float:
     return lib.earth_time_to_msd(int(time())) * 86400.0
