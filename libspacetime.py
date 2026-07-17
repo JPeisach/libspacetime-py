@@ -45,6 +45,18 @@ def ammarstime(seconds: float | int | None = None, /) -> struct_marstime:
     _out = lib.ammarstime(ffi.new("long*", seconds))
     return struct_marstime(mars_tm_year=_out.mars_tm_year, mars_tm_mon=_out.mars_tm_mon, mars_tm_msol=_out.mars_tm_msol, mars_tm_hour=_out.mars_tm_hour, mars_tm_min=_out.mars_tm_min, mars_tm_sec=_out.mars_tm_sec, mars_tm_wsol=_out.mars_tm_wsol, mars_tm_ysol=_out.mars_tm_ysol)
 
+# TODO: Timezones.
+def localmarstime(seconds: float | int | None = None, /) -> struct_marstime:
+    # Until timezones exist, just call ammarstime.
+    # Which is just what the library does.
+    # When that changes this won't need an update (hopefully)..
+    # validation checks may be needed
+    # If secs is None, use current time.
+    if seconds is None:
+        seconds = int(mars_time())
+
+    return ammarstime(seconds)
+
 # TODO: I don't get the rationale for how a float could be returned for this.
 # TODO: If time cannot be represented raise error
 def mkmarstime(time_tuple: _MarsTimeTuple | struct_marstime, /) -> float:
