@@ -46,6 +46,7 @@ def ammarstime(seconds: float | int | None = None, /) -> struct_marstime:
     return struct_marstime(mars_tm_year=_out.mars_tm_year, mars_tm_mon=_out.mars_tm_mon, mars_tm_msol=_out.mars_tm_msol, mars_tm_hour=_out.mars_tm_hour, mars_tm_min=_out.mars_tm_min, mars_tm_sec=_out.mars_tm_sec, mars_tm_wsol=_out.mars_tm_wsol, mars_tm_ysol=_out.mars_tm_ysol)
 
 # TODO: I don't get the rationale for how a float could be returned for this.
+# TODO: If time cannot be represented raise error
 def mkmarstime(time_tuple: _MarsTimeTuple | struct_marstime, /) -> float:
     # As far as I know.. the best way to do this
     tm = ffi.new("struct mars_tm*")
@@ -59,6 +60,7 @@ def mkmarstime(time_tuple: _MarsTimeTuple | struct_marstime, /) -> float:
     tm.mars_tm_ysol = time_tuple.mars_tm_ysol
     return lib.mkmarstime(tm)
 
+# TODO: in strftime, python checks for legal formats
 def strfmarstime(format: str, time_tuple: _MarsTimeTuple | struct_marstime = ..., /) -> str:
     _format = ffi.new("char[]", format.encode("utf-8"))
     tm = ffi.new("struct mars_tm*", time_tuple)
@@ -68,6 +70,7 @@ def strfmarstime(format: str, time_tuple: _MarsTimeTuple | struct_marstime = ...
     lib.strfmarstime(_buf, 256, _format, tm)
     return ffi.string(_buf).decode()
 
+# TODO: in strptime, python checks for legal formats
 def strpmarstime(data_string: str, format: str = "%a %b %d %H:%M:%S %Y", /) -> struct_marstime:
     # There may be a better way to do this..
     _data_string = ffi.new("char[]", data_string.encode("utf-8"))
